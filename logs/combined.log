@@ -35,3 +35,8 @@
 {"level":"info","message":"::1 - - [27/Jan/2026:11:30:07 +0000] \"POST /api/auth/sign-in HTTP/1.1\" 200 107 \"-\" \"PostmanRuntime/7.51.0\"","service":"acquisitions-api"}
 {"level":"info","message":"User signed out successfully","service":"acquisitions-api"}
 {"level":"info","message":"::1 - - [27/Jan/2026:11:30:26 +0000] \"POST /api/auth/sign-out HTTP/1.1\" 200 29 \"-\" \"PostmanRuntime/7.51.0\"","service":"acquisitions-api"}
+{"ip":"::1","level":"warn","message":"Bot request blocked","path":"/health","service":"acquisitions-api","userAgent":"PostmanRuntime/7.51.0"}
+{"level":"info","message":"::1 - - [27/Jan/2026:12:00:22 +0000] \"GET /health HTTP/1.1\" 403 68 \"-\" \"PostmanRuntime/7.51.0\"","service":"acquisitions-api"}
+{"ip":"::1","level":"warn","message":"Bot request blocked","path":"/health","service":"acquisitions-api","userAgent":"PostmanRuntime/7.51.0"}
+{"level":"info","message":"::1 - - [27/Jan/2026:12:01:08 +0000] \"GET /health HTTP/1.1\" 403 68 \"-\" \"PostmanRuntime/7.51.0\"","service":"acquisitions-api"}
+{"level":"info","message":"::1 - - [27/Jan/2026:12:03:44 +0000] \"GET /health HTTP/1.1\" 200 73 \"-\" \"PostmanRuntime/7.51.0\"","service":"acquisitions-api"}
