@@ -78,7 +78,10 @@ export const updateUser = async (id, updates) => {
     const safeUpdates = { ...updates };
 
     // If password is being updated, hash it before saving
-    if (typeof safeUpdates.password === 'string' && safeUpdates.password.length) {
+    if (
+      typeof safeUpdates.password === 'string' &&
+      safeUpdates.password.length
+    ) {
       safeUpdates.password = await hashPassword(safeUpdates.password);
     }
 
@@ -115,15 +118,12 @@ export const deleteUser = async id => {
       throw new Error('User not found');
     }
 
-    const [deleted] = await db
-      .delete(users)
-      .where(eq(users.id, id))
-      .returning({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        role: users.role,
-      });
+    const [deleted] = await db.delete(users).where(eq(users.id, id)).returning({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+    });
 
     return deleted;
   } catch (error) {

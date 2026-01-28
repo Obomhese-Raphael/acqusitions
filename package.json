@@ -28,7 +28,6 @@
     "dev:docker": "sh ./scripts/dev.sh",
     "prod:docker": "sh ./scripts/prod.sh",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
-
   },
   "repository": {
     "type": "git",
