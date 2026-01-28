@@ -22,7 +22,7 @@ const securityMiddleware = async (req, res, next) => {
 
     const client = aj.withRule(
       slidingWindow({
-        mode: 'LIVE',
+        mode: process.env.NODE_ENV === 'production' ? 'LIVE' : 'DRY_RUN',
         interval: '1m',
         max: limit,
         name: `${role}-rate-limit`,
@@ -66,7 +66,7 @@ const securityMiddleware = async (req, res, next) => {
       });
 
       return res
-        .status(403)
+        .status(429)
         .json({ error: 'Forbidden', message: 'Too many requests' });
     }
 
@@ -74,7 +74,7 @@ const securityMiddleware = async (req, res, next) => {
   } catch (e) {
     console.error('Arcjet middleware error:', e);
     res.status(500).json({
-      errro: 'Internal server error',
+      error: 'Internal server error',
       message: 'Something went wrong with security middleware',
     });
   }
