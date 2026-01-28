@@ -26,7 +26,9 @@
     "db:migrate": "npx drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "dev:docker": "sh ./scripts/dev.sh",
-    "prod:docker": "sh ./scripts/prod.sh"
+    "prod:docker": "sh ./scripts/prod.sh",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+
   },
   "repository": {
     "type": "git",
@@ -57,10 +59,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
-    "prettier": "^3.8.1"
+    "jest": "^30.2.0",
+    "prettier": "^3.8.1",
+    "supertest": "^7.2.2"
   }
 }
