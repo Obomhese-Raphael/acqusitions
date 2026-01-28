@@ -1,113 +1,170 @@
-# Acquisitions API
+# Acquisitions API 🚀
 
-This repository contains an Express.js API that uses Neon Postgres via `@neondatabase/serverless` + Drizzle.
+A secure, Dockerized Node.js + Express REST API for user management and acquisitions workflows.
 
-This project supports two database modes:
+[![Node.js](https://img.shields.io/badge/Node.js-v20-green?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Express](https://img.shields.io/badge/Express-5.x-blue?logo=express&logoColor=white)](https://expressjs.com)
+[![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-0.45-orange)](https://orm.drizzle.team)
+[![Docker](https://img.shields.io/badge/Docker-ready-blue?logo=docker&logoColor=white)](https://www.docker.com)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](/LICENSE)
 
-- Development: Neon Local (Docker) creates an ephemeral Neon branch when the container starts and deletes it when it stops.
-- Production: Connect directly to Neon Cloud using your `DATABASE_URL`.
+## Overview
 
-## Files added
+**Acquisitions** is a modern, production-ready Node.js REST API built with Express.js and Drizzle ORM. It includes secure authentication (JWT + cookies), role-based access control (guest/user/admin), rate limiting, bot protection, and full Docker support — both for development (with Neon Local ephemeral branches) and production.
 
-- `Dockerfile` (multi-stage: `dev` and `prod` targets)
-- `docker-compose.yml` / `docker-compose.dev.yml` (app + Neon Local)
-- `docker-compose.prod.yml` (app only; Neon Cloud is external)
-- `.env.development.example` / `.env.production.example`
+Ideal as a secure boilerplate for:
+- Role-based APIs
+- Dockerized Node.js services
+- Neon Postgres + Drizzle ORM projects
+- APIs with strong security (Arcjet)
 
-## Prerequisites
+## ✨ Features
 
-- Docker Desktop
-- A Neon account + a Neon project
-  - `NEON_API_KEY` and `NEON_PROJECT_ID` are required for Neon Local.
+- 🔐 JWT authentication with secure cookies
+- 👤 Full user management (sign-up, sign-in, list, get by ID, update, delete)
+- 🛡️ Role-based authorization (admin/user/guest)
+- ⚡ Rate limiting per role (Arcjet sliding window)
+- 🤖 Bot detection & Shield protection (Arcjet)
+- 🐳 Docker + Docker Compose (separate dev & prod configs)
+- 🌱 Neon Local for isolated dev database branches
+- 🗄️ Schema migrations with Drizzle Kit
+- 📝 Zod validation, Winston logging, Helmet security
+- 🔄 Hot reload in development
 
-## Development (Neon Local)
+## 🛠 Tech Stack
 
-### 1) Create your dev env file
+| Category            | Technology                              |
+|---------------------|-----------------------------------------|
+| Runtime             | Node.js 20                              |
+| Framework           | Express.js                              |
+| Database            | PostgreSQL (Neon serverless)            |
+| ORM                 | Drizzle ORM + @neondatabase/serverless  |
+| Auth                | JWT, bcrypt, cookie-parser              |
+| Validation          | Zod                                     |
+| Security            | Arcjet (rate limit, bot detection, shield), Helmet |
+| Logging             | Winston                                 |
+| Containerization    | Docker, Docker Compose                  |
+| Dev DB              | Neon Local (ephemeral branches)         |
 
-Copy the example and fill in the Neon values:
+## 📋 Prerequisites
 
-- Copy `.env.development.example` → `.env.development`
-- Set:
-  - `NEON_API_KEY`
-  - `NEON_PROJECT_ID`
+- Node.js ≥ 20
+- Docker & Docker Compose
+- Git
+- (Production) Neon Postgres account + project
 
-Your app will connect to Neon Local inside the compose network using:
+## 🚀 Quick Start – Development
 
-- `DATABASE_URL=postgres://neon:npg@neon-local:5432/neondb`
-
-Because this app uses `@neondatabase/serverless`, you must also set:
-
-- `NEON_FETCH_ENDPOINT=http://neon-local:5432/sql`
-
-### 2) Start the stack
-
-```bash
-docker compose -f docker-compose.dev.yml up --build
-```
-
-API should be available at:
-
-- `http://localhost:3000/health`
-
-### 3) Run database migrations
-
-Neon Local starts with a fresh (often ephemeral) branch, so apply migrations **after** `neon-local` is running.
-
-```bash
-docker compose -f docker-compose.dev.yml run --rm app npm run db:migrate
-```
-
-### 4) Verify the `users` table exists (optional)
-
-If you ever get `users: []` but you expected rows, first verify migrations actually created the table.
-
-Using the app container + Neon HTTP driver:
+### 1. Clone the repository
 
 ```bash
-docker compose -f docker-compose.dev.yml run --rm app node --input-type=module -e "import { sql } from './src/config/database.js'; const r = await sql(\"select to_regclass('public.users') as users_table\"); console.log(r);"
+git clone https://github.com/Obomhese-Raphael/acqusitions.git
+cd acqusitions
 ```
 
-If it prints `null`, the table doesn't exist in the current Neon Local branch.
-
-### 4) Connect to Postgres from your host (optional)
-
-Neon Local exposes port `5432` to your machine:
+### 2. Copy and configure environment file
 
 ```bash
-psql "postgres://neon:npg@localhost:5432/neondb"
+cp .env.development.example .env.development
 ```
 
-## Production (Neon Cloud)
+→ Fill in your Neon API key, project ID, branch ID, etc.
 
-In production you do **not** run Neon Local. Neon Cloud is a managed Postgres service, so the app container connects to it via `DATABASE_URL`.
-
-### 1) Create your prod env file
-
-- Copy `.env.production.example` → `.env.production`
-- Set:
-  - `DATABASE_URL` (your Neon Cloud connection string, e.g. `...neon.tech...`)
-  - `JWT_SECRET` (strong secret)
-
-### 2) Start the app container
+### 3. Start everything with one command
 
 ```bash
-docker compose -f docker-compose.prod.yml up --build
+npm run dev:docker
 ```
 
-## How the environment switch works
+This will:
+- Start Neon Local proxy
+- Apply migrations automatically
+- Run the app with hot reload
 
-- **Development** (`docker-compose.dev.yml`)
-  - Starts `neon-local` + `app`
-  - `app` reads `.env.development`
-  - `DATABASE_URL` points to `neon-local` (inside the compose network)
-  - `NEON_FETCH_ENDPOINT` points to Neon Local's SQL HTTP endpoint
+### 4. Test the API
 
-- **Production** (`docker-compose.prod.yml`)
-  - Starts only `app`
-  - `app` reads `.env.production`
-  - `DATABASE_URL` points to Neon Cloud (external)
+- **Health check:** http://localhost:3000/health
+- **Sign up:** POST http://localhost:3000/api/auth/sign-up
+- **Get users:** GET http://localhost:3000/api/users (after login)
 
-## Notes
+## 🏭 Production Deployment
 
-- If you want Neon Local to keep the created branch after shutdown, set `DELETE_BRANCH=false` on the `neon-local` service.
-- If you want to branch from a non-primary branch, set `PARENT_BRANCH_ID`.
+### 1. Prepare production environment file
+
+```bash
+cp .env.production.example .env.production
+```
+
+### 2. Start production container
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+### 3. (Optional) Apply migrations manually
+
+```bash
+docker compose -f docker-compose.prod.yml exec app npm run db:migrate
+```
+
+### 4. Access the API
+
+Access the API at http://localhost:3000 (or your domain)
+
+## 📜 Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Run locally without Docker (node --watch) |
+| `npm run dev:docker` | Full dev env with Neon Local + hot reload |
+| `npm run prod:docker` | Start production container |
+| `npm run db:generate` | Generate new Drizzle migrations |
+| `npm run db:migrate` | Apply pending migrations |
+| `npm run db:studio` | Open Drizzle Studio (DB browser) |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Auto-fix lint issues |
+| `npm run format` | Run Prettier |
+
+## 🔐 Security & Auth Flow
+
+1. **Sign-up** → POST `/api/auth/sign-up` → creates user + sets JWT cookie
+2. **Sign-in** → POST `/api/auth/sign-in` → verifies credentials → sets JWT cookie
+3. **Optional auth** → attaches `req.user` if token exists (doesn't block)
+4. **Required auth** → returns 401 if no/invalid token
+5. **Rate limiting** → guest: 5/min, user: 10/min, admin: 20/min
+6. **Bot protection** → Arcjet blocks automated requests (configurable allow-list for dev tools)
+
+## 🌐 API Endpoints (Overview)
+
+| Method | Endpoint | Description | Auth required? |
+|--------|----------|-------------|----------------|
+| POST | `/api/auth/sign-up` | Register new user | No |
+| POST | `/api/auth/sign-in` | Login & get JWT cookie | No |
+| GET | `/api/users` | List all users | Yes (admin) |
+| GET | `/api/users/:id` | Get user by ID | Yes (self/admin) |
+| PUT | `/api/users/:id` | Update user | Yes (self/admin) |
+| DELETE | `/api/users/:id` | Delete user | Yes (self/admin) |
+| GET | `/health` | Health check | No |
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please ensure linting passes and follow the existing code style.
+
+## 📄 License
+
+This project is licensed under the ISC License — see the [LICENSE](LICENSE) file for details.
+
+## 📬 Author & Contact
+
+**Raphael Obomhese**
+
+- GitHub: [@Obomhese-Raphael](https://github.com/Obomhese-Raphael)
+- Location: Lagos, Nigeria
