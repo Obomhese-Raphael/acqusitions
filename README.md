@@ -42,11 +42,22 @@ API should be available at:
 - `http://localhost:3000/health`
 
 ### 3) Run database migrations
-Neon Local starts with a fresh branch, so apply migrations:
+Neon Local starts with a fresh (often ephemeral) branch, so apply migrations **after** `neon-local` is running.
 
 ```bash
 docker compose -f docker-compose.dev.yml run --rm app npm run db:migrate
 ```
+
+### 4) Verify the `users` table exists (optional)
+If you ever get `users: []` but you expected rows, first verify migrations actually created the table.
+
+Using the app container + Neon HTTP driver:
+
+```bash
+docker compose -f docker-compose.dev.yml run --rm app node --input-type=module -e "import { sql } from './src/config/database.js'; const r = await sql(\"select to_regclass('public.users') as users_table\"); console.log(r);"
+```
+
+If it prints `null`, the table doesn't exist in the current Neon Local branch.
 
 ### 4) Connect to Postgres from your host (optional)
 Neon Local exposes port `5432` to your machine:
